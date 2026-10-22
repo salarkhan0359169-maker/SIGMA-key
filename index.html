@@ -1,0 +1,262 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#030907">
+  <title>SIGMA KEY | Cyber Typing Arena</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body>
+  <canvas id="matrix"></canvas>
+  <div class="scanlines"></div>
+
+  <header class="topbar">
+    <a class="brand" href="#" data-page="arena">
+      <span class="brand-icon">Σ</span>
+      <span>SIGMA<span class="green"> KEY</span><small>CYBER TYPING ARENA</small></span>
+    </a>
+
+    <div class="top-stats">
+      <div><small>BEST SPEED</small><strong id="bestWpm">0 <i>WPM</i></strong></div>
+      <div><small>BEST SCORE</small><strong id="bestScore">0</strong></div>
+    </div>
+
+    <button class="btn btn-outline signin-btn" id="signInBtn">SIGN IN</button>
+  </header>
+
+  <nav class="menubar">
+    <button class="nav-btn active" data-page="arena">01 / ARENA</button>
+    <button class="nav-btn" data-page="settings">02 / SETTINGS</button>
+    <button class="nav-btn" data-page="results">03 / RESULTS</button>
+    <button class="nav-btn" data-page="records">04 / ALL RECORDS</button>
+    <button class="nav-btn" data-page="online">05 / ONLINE</button>
+  </nav>
+
+  <main class="container">
+    <section class="page active" id="page-arena">
+      <div class="section-heading">
+        <div>
+          <p class="eyebrow">// SYSTEM READY</p>
+          <h1>CYBER <span class="green">ARENA</span></h1>
+          <p class="muted">Type accurately. Beat the clock. Prove your speed.</p>
+        </div>
+        <div class="status-pill"><span class="pulse"></span> SYSTEM ONLINE</div>
+      </div>
+
+      <div class="metrics">
+        <div class="metric"><small>TIME LEFT</small><strong id="timeLeft">60<span>s</span></strong></div>
+        <div class="metric"><small>SPEED</small><strong id="wpm">0 <span>WPM</span></strong></div>
+        <div class="metric"><small>ACCURACY</small><strong id="accuracy">100<span>%</span></strong></div>
+        <div class="metric"><small>MISTAKES</small><strong id="mistakes">0 <span>/ 5 MAX</span></strong></div>
+      </div>
+
+      <div class="terminal panel" id="terminal">
+        <div class="terminal-top">
+          <div class="window-dots"><i></i><i></i><i></i></div>
+          <span>root@sigma:~ / typing_mission.exe</span>
+          <span class="terminal-live">LIVE</span>
+        </div>
+
+        <div class="terminal-content">
+          <p class="command-line"><span class="green">root@SIGMA</span>:~$ initialize_typing_mission</p>
+          <p class="terminal-hint" id="missionHint">Press START MISSION to begin.</p>
+
+          <div class="target-text" id="targetText">
+            <span class="muted">Awaiting mission initialization...</span>
+          </div>
+
+          <label class="sr-only" for="typingInput">Type the target text here</label>
+          <textarea id="typingInput" rows="2" spellcheck="false"
+            autocomplete="off" autocapitalize="off"
+            placeholder="Your typing input appears here..." disabled></textarea>
+
+          <div class="terminal-footer">
+            <span>INPUT: <b id="inputStatus">LOCKED</b></span>
+            <span>CHARACTERS: <b id="charCount">0</b></span>
+            <span>WORDS: <b id="wordCount">0 / 20</b></span>
+          </div>
+        </div>
+
+        <div class="result-overlay hidden" id="resultOverlay" aria-live="polite">
+          <div class="result-word" id="resultWord">SUCCESS</div>
+          <p id="resultMessage">MISSION COMPLETE</p>
+          <div class="result-stats">
+            <span>SPEED <b id="finalWpm">0 WPM</b></span>
+            <span>SCORE <b id="finalScore">0</b></span>
+            <span>MISTAKES <b id="finalMistakes">0</b></span>
+          </div>
+          <button class="btn btn-primary" id="overlayRetry">RUN NEW MISSION</button>
+        </div>
+      </div>
+
+      <div class="arena-actions">
+        <button class="btn btn-primary" id="startBtn">▶ START MISSION</button>
+        <button class="btn btn-outline" id="resetBtn">↻ RESET</button>
+        <span class="muted small">Complete before time expires. Maximum mistakes: 5.</span>
+      </div>
+
+      <div class="tip-line">
+        <span class="green">[TIP]</span>
+        Your result appears here immediately. Your detailed report remains available in Results.
+      </div>
+    </section>
+
+    <section class="page" id="page-settings">
+      <div class="section-heading">
+        <div>
+          <p class="eyebrow">// CONFIGURATION</p>
+          <h1>MISSION <span class="green">SETTINGS</span></h1>
+          <p class="muted">Configure your next typing mission.</p>
+        </div>
+      </div>
+
+      <div class="panel settings-panel">
+        <div class="setting-row">
+          <div><h3>WORD COUNT</h3><p>Choose how many words to type.</p></div>
+          <select id="wordCountSetting">
+            <option value="20">20 WORDS</option>
+            <option value="50" selected>50 WORDS</option>
+            <option value="100">100 WORDS</option>
+            <option value="500">500 WORDS</option>
+            <option value="1000">1000 WORDS</option>
+            <option value="custom">CUSTOM</option>
+          </select>
+        </div>
+        <div class="setting-row hidden" id="customWordsRow">
+          <div><h3>CUSTOM WORDS</h3><p>Enter a number between 1 and 5000.</p></div>
+          <input id="customWords" type="number" min="1" max="5000" value="30">
+        </div>
+
+        <div class="setting-row">
+          <div><h3>TIME LIMIT</h3><p>How long should the mission last?</p></div>
+          <select id="timeSetting">
+            <option value="30">30 SECONDS</option>
+            <option value="60" selected>60 SECONDS</option>
+            <option value="120">120 SECONDS</option>
+            <option value="300">300 SECONDS</option>
+            <option value="custom">CUSTOM</option>
+          </select>
+        </div>
+        <div class="setting-row hidden" id="customTimeRow">
+          <div><h3>CUSTOM TIME</h3><p>Enter 10 to 3600 seconds.</p></div>
+          <input id="customTime" type="number" min="10" max="3600" value="90">
+        </div>
+
+        <div class="setting-row">
+          <div><h3>MISSION MODE</h3><p>Choose the kind of text to type.</p></div>
+          <select id="modeSetting">
+            <option value="words">ENGLISH WORDS</option>
+            <option value="numbers">NUMBERS</option>
+            <option value="symbols">SYMBOLS</option>
+            <option value="mixed">MIXED / HACKER</option>
+          </select>
+        </div>
+
+        <div class="setting-row">
+          <div><h3>LETTER MATCHING</h3><p>Strict mode treats uppercase and lowercase as different.</p></div>
+          <select id="caseSetting">
+            <option value="strict">STRICT MATCH</option>
+            <option value="ignore">IGNORE CASE</option>
+          </select>
+        </div>
+
+        <button class="btn btn-primary" id="saveSettingsBtn">SAVE SETTINGS</button>
+        <p id="settingsMessage" class="form-message"></p>
+      </div>
+    </section>
+
+    <section class="page" id="page-results">
+      <div class="section-heading">
+        <div>
+          <p class="eyebrow">// MISSION HISTORY</p>
+          <h1>YOUR <span class="green">RESULTS</span></h1>
+          <p class="muted">Detailed reports from your completed missions on this device.</p>
+        </div>
+      </div>
+      <div id="latestReport" class="panel report-panel">
+        <p class="muted">No mission completed yet. Complete a mission to see your report.</p>
+      </div>
+      <div class="panel table-panel">
+        <h2>LOCAL MISSION HISTORY</h2>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>DATE</th><th>RESULT</th><th>WORDS</th><th>WPM</th><th>ACCURACY</th><th>MISTAKES</th><th>SCORE</th></tr></thead>
+            <tbody id="historyBody"><tr><td colspan="7" class="muted">No records yet.</td></tr></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <section class="page" id="page-records">
+      <div class="section-heading">
+        <div>
+          <p class="eyebrow">// GLOBAL LEADERBOARD</p>
+          <h1>ALL <span class="green">RECORDS</span></h1>
+          <p class="muted">Shared leaderboard ranked by highest score.</p>
+        </div>
+        <button class="btn btn-outline" id="refreshRecordsBtn">↻ REFRESH</button>
+      </div>
+      <div class="metrics leaderboard-metrics">
+        <div class="metric"><small>RANKED USERS</small><strong id="recordCount">0</strong></div>
+        <div class="metric"><small>YOUR BEST WPM</small><strong id="recordBestWpm">0 <span>WPM</span></strong></div>
+        <div class="metric"><small>YOUR BEST SCORE</small><strong id="recordBestScore">0</strong></div>
+      </div>
+      <div class="panel table-panel">
+        <div class="table-title-row"><h2>TOP PLAYERS</h2><span class="green">TOP 100</span></div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>RANK</th><th>PLAYER</th><th>SPEED (WPM)</th><th>SCORE</th><th>ACCURACY</th></tr></thead>
+            <tbody id="recordsBody"><tr><td colspan="5" class="muted">Connect Supabase to load the shared leaderboard.</td></tr></tbody>
+          </table>
+        </div>
+        <p class="small muted records-note" id="recordsStatus">Shared records require sign-in and database setup.</p>
+      </div>
+    </section>
+
+    <section class="page" id="page-online">
+      <div class="section-heading">
+        <div>
+          <p class="eyebrow">// MULTIPLAYER ARENA</p>
+          <h1>ONLINE <span class="green">BATTLE</span></h1>
+          <p class="muted">Prepare for a four-player typing competition.</p>
+        </div>
+      </div>
+      <div class="panel online-panel">
+        <div class="online-symbol">⌘</div>
+        <h2>4-PLAYER COMPETITION</h2>
+        <p class="muted">The live multiplayer match room is not enabled yet. The shared All Records leaderboard works once Supabase is configured.</p>
+        <p class="small muted">Live matchmaking requires an additional realtime room and match-state setup.</p>
+        <button class="btn btn-outline" data-page="records">VIEW ALL RECORDS</button>
+      </div>
+    </section>
+  </main>
+
+  <footer><span>SIGMA KEY</span> // TRAIN YOUR REFLEXES. MASTER THE KEYBOARD. <span class="green">[v2.0]</span></footer>
+
+  <div class="modal-backdrop hidden" id="authModal">
+    <div class="modal panel">
+      <button class="modal-close" id="closeAuthBtn" aria-label="Close">×</button>
+      <p class="eyebrow">// PLAYER IDENTITY</p>
+      <h2 id="authTitle">SIGN <span class="green">IN</span></h2>
+      <p class="muted small">Sign in to publish your results to All Records.</p>
+      <form id="authForm">
+        <label for="playerName" id="nameLabel">PLAYER NAME</label>
+        <input id="playerName" type="text" maxlength="24" placeholder="Your display name">
+        <label for="authEmail">EMAIL</label>
+        <input id="authEmail" type="email" required placeholder="you@example.com">
+        <label for="authPassword">PASSWORD</label>
+        <input id="authPassword" type="password" required minlength="6" placeholder="At least 6 characters">
+        <button class="btn btn-primary full-width" id="authSubmitBtn" type="submit">SIGN IN</button>
+      </form>
+      <button class="text-button" id="authModeBtn">Need an account? Create one</button>
+      <p class="form-message" id="authMessage"></p>
+      <button class="btn btn-outline full-width hidden" id="signOutBtn">SIGN OUT</button>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
