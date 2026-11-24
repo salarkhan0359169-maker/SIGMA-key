@@ -191,3 +191,33 @@ footer span:first-child { color: var(--text); }
   .terminal-footer { gap: 10px; }
   .modal { padding: 22px 17px; }
 }
+.seo-section {
+  margin-top: 35px;
+  padding: 25px;
+  color: var(--text);
+  line-height: 1.8;
+}
+
+.seo-section h2 {
+  color: var(--green);
+  font-size: 15px;
+  margin-top: 22px;
+}
+
+.seo-section h2:first-child {
+  margin-top: 0;
+}
+
+.seo-section p,
+.seo-section li {
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.seo-section ul {
+  padding-left: 22px;
+}
+
+.seo-section li {
+  margin: 8px 0;
+}
