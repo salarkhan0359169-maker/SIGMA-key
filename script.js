@@ -4,8 +4,8 @@
    Never put a service_role/secret key in browser code.
    ========================================================== */
 
-const SUPABASE_URL = "YOUR_SUPABASE_PROJECT_URL";
-const SUPABASE_ANON_KEY = "YOUR_SUPABASE_PUBLISHABLE_OR_ANON_KEY";
+const SUPABASE_URL = "https://aswswcrhebinwygrwqkz.supabase.co";
+const SUPABASE_ANON_KEY = "sb_publishable_a0W_ZQpe1wXPCN0QnVfsOQ_Xr3neDUB";
 
 const WORDS = [
   "access", "admin", "algorithm", "analyze", "anonymous", "archive",
